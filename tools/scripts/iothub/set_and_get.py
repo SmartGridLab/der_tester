@@ -26,7 +26,8 @@ payload_get = {
         {
         "command_type": "character",
         "command_code": "get_property_value",
-        "command_value": "instantaneousChargingAndDischargingElectricPower"
+        #get内容の設定
+        "command_value": "operationMode"
         }
       ],
       #######
@@ -51,7 +52,7 @@ payload_set = {
         #######
         # SET内容を指定してください（operationStatus, operationMode, ...)
         #######
-        "command_value": "instantaneousChargingAndDischargingElectricPower"
+        "command_value": "operationMode=standby"
         }
       ],
       #######
