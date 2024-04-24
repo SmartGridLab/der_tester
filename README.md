@@ -8,3 +8,8 @@ Tester to control various distributed energy resources (DERs) for DER service bu
 4. 本ツールの実行
   - `tools/scripts` から必要なバッチファイルを実行してください 
 
+
+## 参考文献
+[Google Drive](https://drive.google.com/drive/folders/196UOfYqHFDTonQh8NCdOVm2RNF1meveH?usp=sharing)に集積していきます。  
+欲しい論文があれば、slackの **# 欲しい論文リクエスト** で荒井さんにリクエストしてください。暇があれば小平も渡します。  
+
