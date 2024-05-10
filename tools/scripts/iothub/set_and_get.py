@@ -13,7 +13,7 @@ import json
 import os
 from dotenv import load_dotenv
 import time
-# import sys
+import sys
 
 load_dotenv()
 
@@ -72,61 +72,63 @@ headers = {
 }
 
 try:
-    response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=20)
-    # print(response_get1.text)
-    jsonData = response_get1.json()
-
-    # ecnonetliteの応答が使用上の都合で複数あるので、それに対応するためのコード。
-    # 今回は、[0]のみを想定しているので、帰ってきたリストの先頭のものだけを取得している。
-    get1 = {
-    'command_code': jsonData['results'][0]["command"][0]["command_code"],
-    'command_value': jsonData['results'][0]["command"][0]["command_value"],
-    'response_result': jsonData['results'][0]["command"][0]["response"][0]["response_result"],
-    'response_value': jsonData['results'][0]["command"][0]["response"][0]["response_value"]
-    }
-
-    print(get1["command_code"]  + " (" + get1["command_value"] + ") ..." + 
-    get1["response_result"] + " (" + get1["response_value"] + ")")
+   response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
+   print(response_get1.text)
+   jsonData = response_get1.json()
+   
+   # ecnonetliteの応答が使用上の都合で複数あるので、それに対応するためのコード
+   for result in jsonData['results']:
+       for command in result["command"]:
+           for response in command["response"]:
+               get1 = {
+                   'command_code': command["command_code"],
+                   'command_value': command["command_value"],
+                   'response_result': response["response_result"],
+                   'response_value': response["response_value"]
+               }
+               print(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})")
 
 except TimeoutError:
-    print("get1 is timed out")
-    pass
+   print("get1 is timed out")
+   pass
+
 
 try:
-    response_set = requests.request("POST", url, headers=headers, json=payload_set, timeout=20)
-    print(response_set.text)
-    jsonData = response_set.json()
-
-    set1 = {
-    'command_code': jsonData['results'][0]["command"][0]["command_code"],
-    'command_value': jsonData['results'][0]["command"][0]["command_value"],
-    'response_result': jsonData['results'][0]["command"][0]["response"][0]["response_result"],
-    'response_value': jsonData['results'][0]["command"][0]["response"][0]["response_value"]
-    }
-
-    print(set1["command_code"]  + " (" + set1["command_value"] + ") ..." + 
-    set1["response_result"] + " (" + set1["response_value"] + ")")
-
+   response_set = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
+   print(response_set.text)
+   jsonData = response_set.json()
+   for result in jsonData['results']:
+       for command in result["command"]:
+           for response in command["response"]:
+               set1 = {
+                   'command_code': command["command_code"],
+                   'command_value': command["command_value"],
+                   'response_result': response["response_result"],
+                   'response_value': response["response_value"]
+               }
+               print(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})")
 except TimeoutError:
-    print("set is timed out")
-    pass
-
+   print("set is timed out")
+   pass
 time.sleep(5)
 
 try:
-    response_get2 = requests.request("POST", url, headers=headers, json=payload_get, timeout=20)
-    # print(response_get2.text)
-    jsonData = response_get2.json()
+   response_get2 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
+   print(response_get2.text)
+   jsonData = response_get2.json()
+   
+ 
+   for result in jsonData['results']:
+       for command in result["command"]:
+           for response in command["response"]:
+               get2 = {
+                   'command_code': command["command_code"],
+                   'command_value': command["command_value"],
+                   'response_result': response["response_result"],
+                   'response_value': response["response_value"]
+               }
+               print(f"{get2['command_code']} ({get2['command_value']}) ... {get2['response_result']} ({get2['response_value']})")
 
-    get2 = {
-    'command_code': jsonData['results'][0]["command"][0]["command_code"],
-    'command_value': jsonData['results'][0]["command"][0]["command_value"],
-    'response_result': jsonData['results'][0]["command"][0]["response"][0]["response_result"],
-    'response_value': jsonData['results'][0]["command"][0]["response"][0]["response_value"]
-    }
-
-    print(get2["command_code"]  + " (" + get2["command_value"] + ") ..." + 
-    get2["response_result"] + " (" + get2["response_value"] + ")")
 except TimeoutError:
-    print("get2 is timed out")
-    pass
+   print("get2 is timed out")
+   pass
