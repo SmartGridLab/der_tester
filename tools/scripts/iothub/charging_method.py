@@ -1,5 +1,4 @@
-# コマンドをセットする手順のところを関数にすることで可読性が高くなると同時に、１回の実行で複数のget/setをすることが容易になりました
-
+#
 import datetime
 import requests
 import json
@@ -117,16 +116,94 @@ def try_set():
         time.sleep(5)
 
 
+#実際にget,setを入れるところ 例：
+#payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+# payload_set=setting("operationMode=standby")
+
+#実行内容 例：（set,getは各１回まで）
+#try_get()
+#try_set()
+
 #実際にget,setを入れるところ
 payload_get=getting("instantaneousChargingAndDischargingElectricPower")
-payload_set=setting("operationMode=standby")
-
 #実行内容（set,getは各１回まで）
-try_get()
-try_set()
 
-#実際にget,setを入れるところ
-payload_get=getting("instantaneousChargingAndDischargingCurrent")
-time.sleep(5)
-#実行内容（set,getは各１回まで）
+#電力取得NGの場合
 try_get()
+if  'response_result'=="NG":
+    print("Getting_Electric_Power_error")
+#電力取得OKの場合。
+else : 
+    print("Getting_Electric_Power_success")
+    if 'response_value'>=1: #電力が1以上の場合の分岐
+        payload_get=getting("operationMode")
+        try_get()
+        if 'response_result'=="NG":
+            print("Getting_OperationMode_error")
+        else:
+            print("Getting_OperationMode_success")
+            if 'response_value'=="charging":
+                print("already_charging")
+            elif 'response_value'=="discharging":
+                print("unexpected_charging(discharging_setting)")
+            else:
+                print("unexpected_charging(standby_setting)")
+        
+        print("Electric_Power<=80")
+    elif 'response_value'>=1: #電力が1以上の場合の分岐
+        payload_get=getting("operationMode")
+        try_get()
+        if 'response_result'=="NG":
+            print("Getting_OperationMode_error")
+        else:
+            print("Getting_OperationMode_success")
+            if 'response_value'=="charging":
+                print("unexpected_discharging(charging_setting)")
+            elif 'response_value'=="standby":
+                print("unexpected_discharging(standby_setting)")
+            else:
+                    payload_get=getting("remainingCapacity3")
+                    try_get()
+                    if 'response_result'=="NG":
+                        print("Getting_RemainingCapacity3_error")
+                    else:
+                        print("Getting_RemainingCapacity3_success")
+                        if 'response_value'<=80:
+                            payload_set=setting("operationMode=charging")
+                            try_set()
+                            if 'response_result'=="NG":
+                                print("Setting_OperationMode_error")
+                            else:
+                                print("Setting_OperationMode_success")
+                        else:
+                            print("too_much_remainingCapacity3")
+                       
+
+    else:#電力が0の場合の分岐
+        payload_get=getting("operationMode")
+        try_get()
+        if 'response_result'=="NG":
+            print("Getting_OperationMode_error")
+        else:
+            print("Getting_OperationMode_success")
+            if 'response_value'=="charging":
+                print("cannot_charge")
+            elif 'response_value'=="discharging":
+                print("cannot_discharge")
+            else:
+                payload_get=getting("remainingCapacity3")
+                try_get()
+                if 'response_result'=="NG":
+                    print("Getting_RemainingCapacity3_error")
+                else:
+                    print("Getting_RemainingCapacity3_success")
+                    if 'response_value'<=80:
+                        payload_set=setting("operationMode=charging")
+                        try_set()
+                        if 'response_result'=="NG":
+                            print("Setting_OperationMode_error")
+                        else:
+                            print("Setting_OperationMode_success")
+                    else:
+                        print("too_much_remainingCapacity3")
+        

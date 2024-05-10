@@ -1,12 +1,4 @@
-# 遠方操作でDER機器をSETした項目の状態確認（SET＆GET）
-# - 引数
-#   - なし
-# - 動作
-#   1. コード文中のSET内容の事前GETを実施
-#   2. コード文中のSET内容をもとにSET信号を送信
-#   3. コード文中で設定された秒数だけWAITしたあとに、GET信号を送信
-# - 出力
-#   - GET, SET の結果をそれぞれコンソールへ表示する
+# getされたresponse_valueを読み込み、それを基に分岐ができる
 
 import requests
 import json
