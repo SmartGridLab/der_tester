@@ -150,7 +150,7 @@ else :
                 print("unexpected_charging(standby_setting)")
         
         print("Electric_Power<=80")
-    elif 'response_value'>=1: #電力が1以上の場合の分岐
+    elif 'response_value'<=-1: #電力が-1以下の場合の分岐
         payload_get=getting("operationMode")
         try_get()
         if 'response_result'=="NG":
@@ -169,12 +169,23 @@ else :
                     else:
                         print("Getting_RemainingCapacity3_success")
                         if 'response_value'<=80:
-                            payload_set=setting("operationMode=charging")
-                            try_set()
-                            if 'response_result'=="NG":
-                                print("Setting_OperationMode_error")
-                            else:
+                            #ここからが本来の動き
+                            #payload_set=setting("operationMode=charging")
+                            #try_set()
+                            #if 'response_result'=="NG":
+                            #    print("Setting_OperationMode_error")
+                            #else:
+                            #    print("Setting_OperationMode_success")
+                            #ここまでが本来の動き
+                            #2分待つ。この間に実機の操作をする。
+                            time.sleep(120)
+                            payload_get=getting("operationMode") #実機操作後のモード取得。
+                            try_get()
+                            #response_valueがchargingになっていれば、成功を出す。
+                            if 'response_value'=="charging":
                                 print("Setting_OperationMode_success")
+                            else:
+                                print("Setting_OperationMode_error")                            
                         else:
                             print("too_much_remainingCapacity3")
                        
@@ -198,12 +209,22 @@ else :
                 else:
                     print("Getting_RemainingCapacity3_success")
                     if 'response_value'<=80:
-                        payload_set=setting("operationMode=charging")
-                        try_set()
-                        if 'response_result'=="NG":
-                            print("Setting_OperationMode_error")
-                        else:
+                        #2分待つ。この間に実機の操作をする。
+                        time.sleep(120)
+                        #ここから本来の動き
+                        #payload_set=setting("operationMode=charging")
+                        #try_set()
+                        #if 'response_result'=="NG":
+                            #print("Setting_OperationMode_error")
+                        #else:
+                            #print("Setting_OperationMode_success")
+                        payload_get=getting("operationMode") #実機操作後のモード取得。
+                        try_get()
+                        #response_valueがchargingになっていれば、成功を出す。
+                        if 'response_value'=="charging":
                             print("Setting_OperationMode_success")
+                        else:
+                            print("Setting_OperationMode_error")
                     else:
                         print("too_much_remainingCapacity3")
         

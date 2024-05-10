@@ -158,12 +158,23 @@ else:
                else:
                    print("Getting_RemainingCapacity3_success")
                    if 'response_value'>=20: #残量が20%以上の場合に放電
-                       payload_set=setting("operationMode=discharging")
-                       try_set()
-                       if 'response_result'=="NG":
-                           print("Setting_OperationMode_error")
-                       else:
-                           print("Setting_OperationMode_success")
+                       #ここから実際の動き
+                       #payload_set=setting("operationMode=discharging")
+                       #try_set()
+                       #if 'response_result'=="NG":
+                           #print("Setting_OperationMode_error")
+                       #else:
+                          # print("Setting_OperationMode_success")
+                        #2分待つ。この間に実機操作
+                        time.sleep(120)
+                        payload_get=getting("operationMode")
+                        try_get()
+                        #response_valueがdischargingになっていれば、成功を出す。
+                        if 'response_value'=="discharging":
+                            print("discharging_success")
+                        else:
+                            print("discharging_failed")
+                        
                    else:
                        print("too_little_remainingCapacity3")
 
@@ -186,11 +197,20 @@ else:
                else:
                    print("Getting_RemainingCapacity3_success") 
                    if 'response_value'>=20: #残量が20%以上の場合に放電
-                       payload_set=setting("operationMode=discharging")
-                       try_set()
-                       if 'response_result'=="NG":
-                           print("Setting_OperationMode_error")
-                       else:
-                           print("Setting_OperationMode_success")
+                       #ここから本来の動き  
+                       #payload_set=setting("operationMode=discharging")
+                       #try_set()
+                       #if 'response_result'=="NG":
+                           #print("Setting_OperationMode_error")
+                       #else:
+                           #print("Setting_OperationMode_success")
+                        time.sleep(120)
+                        payload_get=getting("operationMode")
+                        try_get()
+                        #response_valueがdischargingになっていれば、成功を出す。
+                        if 'response_value'=="discharging":
+                            print("discharging_success")
+                        else:
+                            print("discharging_failed")
                    else:
                        print("too_little_remainingCapacity3")
