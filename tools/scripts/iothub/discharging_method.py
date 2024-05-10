@@ -171,9 +171,16 @@ else:
                         try_get()
                         #response_valueがdischargingになっていれば、成功を出す。
                         if 'response_value'=="discharging":
-                            print("discharging_success")
+                            print("setting_operationMode_success")
+                            time.sleep(20)
+                            payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+                            try_get()
+                            if 'response_value'<=-1:
+                                print("disCharging_success")
+                            else:
+                                print("discharging_error")
                         else:
-                            print("discharging_failed")
+                            print("setting_operationMode_failed")
                         
                    else:
                        print("too_little_remainingCapacity3")
@@ -209,8 +216,15 @@ else:
                         try_get()
                         #response_valueがdischargingになっていれば、成功を出す。
                         if 'response_value'=="discharging":
-                            print("discharging_success")
+                            print("setting_operationMode_success")
+                            time.sleep(20)
+                            payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+                            try_get()
+                            if 'response_value'<=-1:
+                                print("disCharging_success")
+                            else:
+                                print("discharging_error")
                         else:
-                            print("discharging_failed")
+                            print("setting_operationMode_failed")
                    else:
                        print("too_little_remainingCapacity3")

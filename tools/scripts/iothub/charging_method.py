@@ -176,6 +176,11 @@ else :
                             #    print("Setting_OperationMode_error")
                             #else:
                             #    print("Setting_OperationMode_success")
+                            time.sleep(20)
+                            payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+                            try_get()
+                            if 'response_value'>=1:
+                                print("Charging_success")
                             #ここまでが本来の動き
                             #2分待つ。この間に実機の操作をする。
                             time.sleep(120)
@@ -184,6 +189,13 @@ else :
                             #response_valueがchargingになっていれば、成功を出す。
                             if 'response_value'=="charging":
                                 print("Setting_OperationMode_success")
+                                time.sleep(20)
+                                payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+                                try_get()
+                                if 'response_value'>=1:
+                                    print("Charging_success")
+                                else:
+                                    print("charging_error")
                             else:
                                 print("Setting_OperationMode_error")                            
                         else:
@@ -223,6 +235,13 @@ else :
                         #response_valueがchargingになっていれば、成功を出す。
                         if 'response_value'=="charging":
                             print("Setting_OperationMode_success")
+                            time.sleep(20)
+                            payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+                            try_get()
+                            if 'response_value'>=1:
+                                print("Charging_success")
+                            else:
+                                print("charging_error")
                         else:
                             print("Setting_OperationMode_error")
                     else:
