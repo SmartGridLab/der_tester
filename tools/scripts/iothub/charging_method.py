@@ -99,9 +99,9 @@ def try_set():
         response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
         print(response_get1.text)
         jsonData = response_get1.json()
-        for result in jsonData['results']:
-            for command in result["command"]:
-                for response in command["response"]:
+        for result in reversed(jsonData['results']):
+            for command in reversed(result["command"]):
+                for response in reversed(command["response"]):
                     set1 = {
                         'command_code': command["command_code"],
                         'command_value': command["command_value"],
@@ -193,7 +193,7 @@ else :
                         # ここまでが本来の動き
 
                         # ここからが一時的な処置。2分待つ。この間に実機の操作をする。
-                        print("1min_dake_matteyaru")
+                        print("1min_waiting")
                         time.sleep(60)
                         payload_get = getting("operationMode")  # 実機操作後のモード取得。
                         try_get()
@@ -232,10 +232,11 @@ else :
                     print("Getting_RemainingCapacity3_error")
                 else:
                     print("Getting_RemainingCapacity3_success")
-                    RemainingCapacity3 = int('response_value')
-                    if RemainingCapacity3<=80:
+                    RemainingCapacity3 = int(get1['response_value'])
+                    if RemainingCapacity3<=95:
                         #2分待つ。この間に実機の操作をする。
-                        time.sleep(120)
+                        print("1min_waiting")
+                        time.sleep(60)
                         #ここから本来の動き
                         #payload_set=setting("operationMode=charging")
                         #try_set()
@@ -246,7 +247,7 @@ else :
                         payload_get=getting("operationMode") #実機操作後のモード取得。
                         try_get()
                         #response_valueがchargingになっていれば、成功を出す。
-                        if get1['response_value']=="charging":
+                        if get1['response_value']=="charging" or "auto":
                             print("Setting_OperationMode_success")
                             time.sleep(20)
                             payload_get=getting("instantaneousChargingAndDischargingElectricPower")

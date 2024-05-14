@@ -60,15 +60,18 @@ headers = {
  "Authorization": "Bearer "+os.environ['ACCESS_TOKEN'],
  "X-IOT-API-KEY": os.environ['API_KEY']
 }
+get1 = None
 #try_get,try_setの関数
 def try_get():
+    global get1
+    get1 = None
     try:
         response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
         print(response_get1.text)
         jsonData = response_get1.json()
-        for result in jsonData['results']:
-            for command in result["command"]:
-                for response in command["response"]:
+        for result in reversed(jsonData['results']):
+            for command in reversed(result["command"]):
+                for response in reversed(command["response"]):
                     get1 = {
                         'command_code': command["command_code"],
                         'command_value': command["command_value"],
@@ -79,11 +82,13 @@ def try_get():
                     #print()の中身をtxtファイルに書き込む
                     with open('log.txt', mode='a') as f:
                         f.write(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})\n")
+                     
     except TimeoutError:
         print("get1 is timed out")   
         #print()の中身をtxtファイルに書き込む
         with open('log.txt', mode='a') as f:
             f.write("get1 is timed out\n")    
+        
         pass
         time.sleep(5)
   
@@ -92,9 +97,9 @@ def try_set():
         response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
         print(response_get1.text)
         jsonData = response_get1.json()
-        for result in jsonData['results']:
-            for command in result["command"]:
-                for response in command["response"]:
+        for result in reversed(jsonData['results']):
+            for command in reversed(result["command"]):
+                for response in reversed(command["response"]):
                     set1 = {
                         'command_code': command["command_code"],
                         'command_value': command["command_value"],
@@ -124,40 +129,43 @@ if  'response_result'=="NG":
 #電力取得OKの場合
 else:
    print("Getting_Electric_Power_success")
-   if 'response_value'<=-1: #電力が-1以下の場合の分岐
+   Electric_Power = int(get1['response_value'])
+   if Electric_Power<=-1: #電力が-1以下の場合の分岐
+       
        payload_get=getting("operationMode")
        try_get()
-       if 'response_result'=="NG":
+       if get1['response_result']=="NG":
            print("Getting_OperationMode_error")
        else:
            print("Getting_OperationMode_success")
-           if 'response_value'=="discharging":
+           if get1['response_value']=="discharging":
                print("already_discharging")
-           elif 'response_value'=="charging":
+           elif get1['response_value']=="charging":
                print("unexpected_discharging(charging_setting)")
-           else:
-               print("unexpected_discharging(standby_setting)")
+           elif get1['response_value']=="standby" or "auto":
+                print("unexpected_charging(standby_setting)")
        
-   elif 'response_value'>=1: #電力が1以上の場合の分岐 
+   elif Electric_Power>=1: #電力が1以上の場合の分岐 
        
        payload_get=getting("operationMode")
        try_get()
-       if 'response_result'=="NG":
+       if get1['response_result']=="NG":
            print("Getting_OperationMode_error")
        else:
            print("Getting_OperationMode_success")
-           if 'response_value'=="discharging":
+           if get1['response_value']=="discharging":
                print("unexpected_charging(discharging_setting)") 
-           elif 'response_value'=="standby":
+           elif get1['response_value']=="standby":
                print("unexpected_charging(standby_setting)")
            else:
                payload_get=getting("remainingCapacity3")
                try_get()
-               if 'response_result'=="NG":
+               if get1['response_result']=="NG":
                    print("Getting_RemainingCapacity3_error")
                else:
                    print("Getting_RemainingCapacity3_success")
-                   if 'response_value'>=20: #残量が20%以上の場合に放電
+                   RemainingCapacity3 = int(get1['response_value'])
+                   if RemainingCapacity3>=20: #残量が20%以上の場合に放電
                        #ここから実際の動き
                        #payload_set=setting("operationMode=discharging")
                        #try_set()
@@ -165,17 +173,19 @@ else:
                            #print("Setting_OperationMode_error")
                        #else:
                           # print("Setting_OperationMode_success")
-                        #2分待つ。この間に実機操作
-                        time.sleep(120)
+                        #1分待つ。この間に実機操作
+                        print("waiting_1min")
+                        time.sleep(60)
                         payload_get=getting("operationMode")
                         try_get()
                         #response_valueがdischargingになっていれば、成功を出す。
-                        if 'response_value'=="discharging":
+                        if get1['response_value']=="discharging" or "auto":
                             print("setting_operationMode_success")
                             time.sleep(20)
                             payload_get=getting("instantaneousChargingAndDischargingElectricPower")
                             try_get()
-                            if 'response_value'<=-1:
+                            Electric_Power = int(get1['response_value'])
+                            if Electric_Power<=-1:
                                 print("disCharging_success")
                             else:
                                 print("discharging_error")
@@ -188,22 +198,23 @@ else:
    else: #電力が0の場合の分岐
        payload_get=getting("operationMode") 
        try_get()
-       if 'response_result'=="NG":
+       if get1['response_result']=="NG":
            print("Getting_OperationMode_error")
        else:
            print("Getting_OperationMode_success")
-           if 'response_value'=="charging":
-               print("cannot_discharge")
-           elif 'response_value'=="discharging":
+           if get1['response_value']=="charging":
+               print("cannot_charge")
+           elif get1['response_value']=="discharging":
                print("cannot_discharge")
            else:
                payload_get=getting("remainingCapacity3")
                try_get()
-               if 'response_result'=="NG":
+               if get1['response_result']=="NG":
                    print("Getting_RemainingCapacity3_error")
                else:
                    print("Getting_RemainingCapacity3_success") 
-                   if 'response_value'>=20: #残量が20%以上の場合に放電
+                   RemainingCapacity3 = int(get1['response_value'])
+                   if RemainingCapacity3>=20: #残量が20%以上の場合に放電
                        #ここから本来の動き  
                        #payload_set=setting("operationMode=discharging")
                        #try_set()
@@ -211,16 +222,18 @@ else:
                            #print("Setting_OperationMode_error")
                        #else:
                            #print("Setting_OperationMode_success")
-                        time.sleep(120)
+                        print("waiting_1min")
+                        time.sleep(60)
                         payload_get=getting("operationMode")
                         try_get()
                         #response_valueがdischargingになっていれば、成功を出す。
-                        if 'response_value'=="discharging":
+                        if get1['response_value']=="discharging" or "auto":
                             print("setting_operationMode_success")
                             time.sleep(20)
                             payload_get=getting("instantaneousChargingAndDischargingElectricPower")
                             try_get()
-                            if 'response_value'<=-1:
+                            Electric_Power = int(get1['response_value'])
+                            if Electric_Power<=-1:
                                 print("disCharging_success")
                             else:
                                 print("discharging_error")
