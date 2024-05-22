@@ -1,4 +1,9 @@
-#
+#蓄電池を充電状態にしたい場合に実行するプログラム。
+#因数：main.pyから呼び出される。特になし
+#戻り値：放電から充電の成功:DC01,停止から充電の成功:SC01,放電から充電の失敗:ERROR （ERRORの原因はlogで確認する。）
+#途中経過はlogに書き込まれる。
+#全体として、SOCを20~80に保つと同時に、蓄電池の実際の動作と表示上の動作が一致するか確認しつつ、充電への切り替えを行う。
+
 import datetime
 import requests
 import json
@@ -6,139 +11,140 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
-
-load_dotenv()
-
-url = os.environ['TARGET_URL']
-
-
-# getの関数
-def  getting(getvalue):
-  payload_get = {
-   "requests": [
-     {
-       "command": [
-         {
-         "command_type": "character",
-         "command_code": "get_property_value",
-      
-        "command_value": getvalue
-         }
-       ],
-
-       "driver_id": os.environ['DRIVER_ID'], 
-       "r_edge_id": os.environ['R_EDGE_ID'],
-       "thing_uuid": os.environ['THING_UUID']
-      }
-    ]
-  }
-  return payload_get
-
-
-
-#setの関数
-def setting(setvalue):
-  payload_set = {
-   "requests": [
-     {
-       "command": [
-         {
-         "command_type": "character", 
-         "command_code": "set_property_value",
-         "command_value": setvalue}
-       ],
-
-       "driver_id": os.environ['DRIVER_ID'],
-       "r_edge_id": os.environ['R_EDGE_ID'],
-       "thing_uuid": os.environ['THING_UUID']
-      } 
-    ]
-  }
-  return payload_set
-
-headers = {
-  "Content-type": "application/json",
-  "Authorization": "Bearer "+os.environ['ACCESS_TOKEN'],
-  "X-IOT-API-KEY": os.environ['API_KEY']
-}
-
-get1 = None
-#try_get,try_setの関数
-def try_get():
-    global get1
-    get1 = None
-    try:
-        response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
-        print(response_get1.text)
-        jsonData = response_get1.json()
-        for result in reversed(jsonData['results']):
-            for command in reversed(result["command"]):
-                for response in reversed(command["response"]):
-                    get1 = {
-                        'command_code': command["command_code"],
-                        'command_value': command["command_value"],
-                        'response_result': response["response_result"],
-                        'response_value': response["response_value"]
-                    }
-                    print(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})")
-                    #print()の中身をtxtファイルに書き込む
-                    with open('log.txt', mode='a') as f:
-                        f.write(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})\n")
-                     
-    except TimeoutError:
-        print("get1 is timed out")   
-        #print()の中身をtxtファイルに書き込む
-        with open('log.txt', mode='a') as f:
-            f.write("get1 is timed out\n")    
-        
-        pass
-        time.sleep(5)
+def run_charging_method():
+  load_dotenv()
   
-def try_set():
-    try:
-        response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
-        print(response_get1.text)
-        jsonData = response_get1.json()
-        for result in reversed(jsonData['results']):
-            for command in reversed(result["command"]):
-                for response in reversed(command["response"]):
-                    set1 = {
-                        'command_code': command["command_code"],
-                        'command_value': command["command_value"],
-                        'response_result': response["response_result"],
-                        'response_value': response["response_value"]
-                    }
-                    print(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})")
-                    #print()の中身をtxtファイルに書き込む
-                    with open('log.txt', mode='a') as f:
-                        f.write(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})\n")
-    except TimeoutError:
-        print("set1 is timed out")
-        #print()の中身をtxtファイルに書き込む
-        with open('log.txt', mode='a') as f:
-            f.write("set1 is timed out\n")
-        pass
-        time.sleep(5)
-
-
-#実際にget,setを入れるところ 例：
-#payload_get=getting("instantaneousChargingAndDischargingElectricPower")
-# payload_set=setting("operationMode=standby")
-
-#実行内容 例：（set,getは各１回まで）
-#try_get()
-#try_set()
-
-#実際にget,setを入れるところ
-payload_get=getting("instantaneousChargingAndDischargingElectricPower")
-#実行内容（set,getは各１回まで）
-
-#電力取得NGの場合
+  url = os.environ['TARGET_URL']
+  
+  
+  # getの関数
+  def  getting(getvalue):
+    payload_get = {
+     "requests": [
+       {
+         "command": [
+           {
+           "command_type": "character",
+           "command_code": "get_property_value",
+        
+          "command_value": getvalue
+           }
+         ],
+  
+         "driver_id": os.environ['DRIVER_ID'], 
+         "r_edge_id": os.environ['R_EDGE_ID'],
+         "thing_uuid": os.environ['THING_UUID']
+        }
+      ]
+    }
+    return payload_get
+  
+  
+  
+  #setの関数
+  def setting(setvalue):
+    payload_set = {
+     "requests": [
+       {
+         "command": [
+           {
+           "command_type": "character", 
+           "command_code": "set_property_value",
+           "command_value": setvalue}
+         ],
+  
+         "driver_id": os.environ['DRIVER_ID'],
+         "r_edge_id": os.environ['R_EDGE_ID'],
+         "thing_uuid": os.environ['THING_UUID']
+        } 
+      ]
+    }
+    return payload_set
+  
+  headers = {
+    "Content-type": "application/json",
+    "Authorization": "Bearer "+os.environ['ACCESS_TOKEN'],
+    "X-IOT-API-KEY": os.environ['API_KEY']
+  }
+  
+  get1 = None
+  #try_get,try_setの関数
+  def try_get():
+      global get1
+      get1 = None
+      try:
+          response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
+          print(response_get1.text)
+          jsonData = response_get1.json()
+          for result in reversed(jsonData['results']):
+              for command in reversed(result["command"]):
+                  for response in reversed(command["response"]):
+                      get1 = {
+                          'command_code': command["command_code"],
+                          'command_value': command["command_value"],
+                          'response_result': response["response_result"],
+                          'response_value': response["response_value"]
+                      }
+                      print(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})")
+                      #print()の中身をtxtファイルに書き込む
+                      with open('log.txt', mode='a') as f:
+                          f.write(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})\n")
+                       
+      except TimeoutError:
+          print("get1 is timed out")   
+          #print()の中身をtxtファイルに書き込む
+          with open('log.txt', mode='a') as f:
+              f.write("get1 is timed out\n")    
+          
+          pass
+          time.sleep(5)
+    
+  def try_set():
+      try:
+          response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
+          print(response_get1.text)
+          jsonData = response_get1.json()
+          for result in reversed(jsonData['results']):
+              for command in reversed(result["command"]):
+                  for response in reversed(command["response"]):
+                      set1 = {
+                          'command_code': command["command_code"],
+                          'command_value': command["command_value"],
+                          'response_result': response["response_result"],
+                          'response_value': response["response_value"]
+                      }
+                      print(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})")
+                      #print()の中身をtxtファイルに書き込む
+                      with open('log.txt', mode='a') as f:
+                          f.write(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})\n")
+      except TimeoutError:
+          print("set1 is timed out")
+          #print()の中身をtxtファイルに書き込む
+          with open('log.txt', mode='a') as f:
+              f.write("set1 is timed out\n")
+          pass
+          time.sleep(5)
+  
+  
+  #実際にget,setを入れるところ 例：
+  #payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+  # payload_set=setting("operationMode=standby")
+  
+  #実行内容 例：（set,getは各１回まで）
+  #try_get()
+  #try_set()
+  
+  #実際にget,setを入れるところ
+  payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+  #実行内容（set,getは各１回まで）
+  
+  #電力取得NGの場合
 try_get()
-if  get1['response_result']=="NG":
+if get1['response_result']=="NG":
     print("Getting_Electric_Power_error")
+    return "ERROR"
 #電力取得OKの場合。
-else : 
+else:
     print("Getting_Electric_Power_success")
     Electric_Power = int(get1['response_value'])
     if Electric_Power >=1: #電力が1以上の場合の分岐
@@ -146,31 +152,38 @@ else :
         try_get()
         if get1['response_result']=="NG":
             print("Getting_OperationMode_error")
+            return "ERROR"
         else:
             print("Getting_OperationMode_success")
             if get1['response_value']=="charging":
                 print("already_charging")
+                return "ERROR"
             elif get1['response_value']=="discharging":
                 print("unexpected_charging(discharging_setting)")
+                return "ERROR"
             elif get1['response_value']=="standby" or "auto":
                 print("unexpected_charging(standby_setting)")
-        
+                return "ERROR"
+
     elif Electric_Power<=-1: #電力が-1以下の場合の分岐
         payload_get=getting("operationMode")
         try_get()
         if get1['response_result']=="NG":
             print("Getting_OperationMode_error")
+            return "ERROR"
         else:
-            
             if get1['response_value'] == "charging":
                 print("unexpected_discharging(charging_setting)")
+                return "ERROR"
             elif get1['response_value'] == "standby":
                 print("unexpected_discharging(standby_setting)")
+                return "ERROR"
             else:
                 payload_get = getting("remainingCapacity3")
                 try_get()
                 if get1['response_result'] == "NG":
                     print("Getting_RemainingCapacity3_error")
+                    return "ERROR"
                 else:
                     print("Getting_RemainingCapacity3_success")
                     RemainingCapacity3 = int(get1['response_value'])
@@ -198,7 +211,7 @@ else :
                         payload_get = getting("operationMode")  # 実機操作後のモード取得。
                         try_get()
                         # response_valueがchargingになっていれば、成功を出す。
-                        if get1["command_value"] == "charging" or "auto":
+                        if get1["response_value"] == "charging" or "auto":
                             print("Setting_OperationMode_success")
                             time.sleep(20)
                             payload_get = getting("instantaneousChargingAndDischargingElectricPower")
@@ -206,30 +219,37 @@ else :
                             Electric_Power = int(get1['response_value'])
                             if Electric_Power >= 1:
                                 print("Charging_success")
+                                return "DC01"
                             else:
                                 print("charging_error")
+                                return "ERROR"
                         else:
                             print("Setting_OperationMode_error")
+                            return "ERROR"
                     else:
                         print("too_much_remainingCapacity3(dischaging_setting)")
-            
-           
+                        return "ERROR"
+
     else:#電力が0の場合の分岐
         payload_get=getting("operationMode")
         try_get()
         if get1['response_result']=="NG":
             print("Getting_OperationMode_error")
+            return "ERROR"
         else:
             print("Getting_OperationMode_success")
             if get1['response_value']=="charging":
                 print("cannot_charge")
+                return "ERROR"
             elif get1['response_value']=="discharging":
                 print("cannot_discharge")
+                return "ERROR"
             elif get1['response_value']=="standby" or "auto":
                 payload_get=getting("remainingCapacity3")
                 try_get()
                 if get1['response_result']=="NG":
                     print("Getting_RemainingCapacity3_error")
+                    return "ERROR"
                 else:
                     print("Getting_RemainingCapacity3_success")
                     RemainingCapacity3 = int(get1['response_value'])
@@ -255,10 +275,16 @@ else :
                             Electric_Power = int(get1['response_value'])
                             if Electric_Power>=1:
                                 print("Charging_success")
+                                return "SC01"
                             else:
                                 print("charging_error")
+                                return "ERROR"
                         else:
                             print("Setting_OperationMode_error")
+                            return "ERROR"
                     else:
                         print("too_much_remainingCapacity3(standby_setting)")
-        
+                        return "ERROR"
+          
+if __name__ == "__main__":
+    run_charging_method()
