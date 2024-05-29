@@ -17,6 +17,7 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
+import pytz
 
 #充電メソッドを実行する関数
 def run_charging_method():
@@ -98,8 +99,13 @@ def run_charging_method():
                       }
                       #get1の中身をprintする    
                       print(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})")
+                     #タイムスタンプを追加
+                      print(datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime("%Y/%m/%d %H:%M:%S"))
+                        #get1の中身をprintする
+
                       #print()の中身をtxtファイルに書き込む
                       with open('log.txt', mode='a') as f:
+                          f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S") + " ")
                           f.write(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})\n")
                        
       except TimeoutError:
@@ -114,9 +120,9 @@ def run_charging_method():
 
   def try_set():
       try:
-          response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
-          print(response_get1.text)
-          jsonData = response_get1.json()
+          response_set1 = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
+          print(response_set1.text)
+          jsonData = response_set1.json()
           #リクエストを行い、set1に入れる。最後にset1が欲しい値になるために、reversed()を使って逆順にしている。
           for result in reversed(jsonData['results']):
               for command in reversed(result["command"]):
@@ -141,6 +147,7 @@ def run_charging_method():
           time.sleep(5)
   
 #getのpayloadを電力取得にする
+  payload_set=setting("operationMode=charging")
   payload_get=getting("instantaneousChargingAndDischargingElectricPower")
 #getを実行してみる
   try_get()

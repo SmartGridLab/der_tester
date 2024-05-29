@@ -27,7 +27,7 @@ payload_get = {
         "command_type": "character",
         "command_code": "get_property_value",
         #get内容の設定
-        "command_value": "operationMode"
+        "command_value": "actualOperationMode"
         }
       ],
       #######
@@ -52,7 +52,7 @@ payload_set = {
         #######
         # SET内容を指定してください（operationStatus, operationMode, ...)
         #######
-        "command_value": "operationMode=standby"
+        "command_value": "operationMode=charging"
         }
       ],
       #######

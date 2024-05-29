@@ -109,9 +109,9 @@ def run_check_POC_method():
     def try_set():
         
         try:
-            response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
-            print(response_get1.text)
-            jsonData = response_get1.json()
+            response_set1 = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
+            print(response_set1.text)
+            jsonData = response_set1.json()
             #リクエストを行い、get1に入れる。最後にget1が欲しい値になるために、reversed()を使って逆順にしている。
             for result in reversed(jsonData['results']):
                 for command in reversed(result["command"]):
