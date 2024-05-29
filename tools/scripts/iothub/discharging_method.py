@@ -17,6 +17,9 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
+import pytz
+
+
 #放電メソッドの実行
 def run_discharging_method():
  #.envファイルの読み込み
@@ -91,10 +94,17 @@ def run_discharging_method():
                          'response_result': response["response_result"],
                          'response_value': response["response_value"]
                      }
+                     #タイムスタンプを追加
+                     print(datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime("%Y/%m/%d %H:%M:%S"))
                         #get1の中身をprintする
+                
                      print(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})")
                      #print()の中身をtxtファイルに書き込む
                      with open('log.txt', mode='a') as f:
+                         #タイムスタンプを追加
+                         f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S") + " ")
+                         
+
                          f.write(f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})\n")
                       
      except TimeoutError:
@@ -125,7 +135,10 @@ def run_discharging_method():
                      #set1の中身をprintする
                      print(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})")
                      #print()の中身をtxtファイルに書き込む
+                     
                      with open('log.txt', mode='a') as f:
+                         #タイムスタンプを追加
+                         f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S") + " ")                         
                          f.write(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})\n")
      except TimeoutError:
          print("set1 is timed out")
@@ -214,7 +227,7 @@ def run_discharging_method():
                          #1分待つ。この間に実機操作
                          print("waiting_1min")
                          time.sleep(60)
-                         
+
                          payload_get=getting("operationMode")
                          try_get()
                          #response_valueがdischargingになっていれば、成功を出す。
