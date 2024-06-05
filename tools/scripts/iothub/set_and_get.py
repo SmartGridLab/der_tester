@@ -52,7 +52,7 @@ payload_set = {
         #######
         # SET内容を指定してください（operationStatus, operationMode, ...)
         #######
-        "command_value": "operationMode=charging"
+        "command_value": "operationMode=discharging"
         }
       ],
       #######
