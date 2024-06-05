@@ -118,9 +118,9 @@ def run_discharging_method():
    
  def try_set():
      try:
-         response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
-         print(response_get1.text)
-         jsonData = response_get1.json()
+         response_set1 = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
+         print(response_set1.text)
+         jsonData = response_set1.json()
          #リクエストを行い、set1に入れる。最後にset1が欲しい値になるために、reversed()を使って逆順にしている。
          for result in reversed(jsonData['results']):
              for command in reversed(result["command"]):
@@ -216,17 +216,15 @@ def run_discharging_method():
                  else:
                      print("Getting_RemainingCapacity3_success")
                      RemainingCapacity3 = int(get1['response_value'])
-                     if RemainingCapacity3>=20: #残量が20%以上の場合に放電
-                         #ここから実際の動き
-                         #payload_set=setting("operationMode=discharging")
-                         #try_set()
-                         #if 'response_result'=="NG":
-                             #print("Setting_OperationMode_error")
-                         #else:
-                             #print("Setting_OperationMode_success")
-                         #1分待つ。この間に実機操作
-                         print("waiting_1min")
-                         time.sleep(60)
+                     if RemainingCapacity3>=10: #残量が10%以上の場合に放電
+                         
+                         payload_set=setting("operationMode=discharging")
+                         try_set()
+                         if 'response_result'=="NG":
+                             print("Setting_OperationMode_error")
+                         else:
+                             print("Setting_OperationMode_success")
+                         
 
                          payload_get=getting("operationMode")
                          try_get()
@@ -277,15 +275,14 @@ def run_discharging_method():
                      print("Getting_RemainingCapacity3_success")
                      RemainingCapacity3 = int(get1['response_value'])
                      if RemainingCapacity3>=20: #残量が20%以上の場合に放電
-                         #ここから本来の動き
-                         #payload_set=setting("operationMode=discharging")
-                         #try_set()
-                         #if 'response_result'=="NG":
-                             #print("Setting_OperationMode_error")
-                         #else:
-                             #print("Setting_OperationMode_success")
-                         print("waiting_1min")
-                         time.sleep(60)
+                         
+                         payload_set=setting("operationMode=discharging")
+                         try_set()
+                         if 'response_result'=="NG":
+                             print("Setting_OperationMode_error")
+                         else:
+                             print("Setting_OperationMode_success")
+                         
                          payload_get=getting("operationMode")
                          try_get()
                          #response_valueがdischargingになっていれば、成功を出す。

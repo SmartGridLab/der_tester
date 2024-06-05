@@ -216,30 +216,23 @@ def run_charging_method():
                     RemainingCapacity3 = int(get1['response_value'])
                     #remainingCapacity3が90以下の場合
                     if RemainingCapacity3 <= 90:
-                        # ここからが本来の動き
-                        #payload_set = setting("operationMode=charging")
-                        #try_set()
-                        #if get1['response_result'] == "NG":
-                        #    print("Setting_OperationMode_error")
-                        #else:
-                        #    print("Setting_OperationMode_success")
-                        #time.sleep(20)
-                        #payload_get = getting("instantaneousChargingAndDischargingElectricPower")
-                        #try_get()
-                        #Electric_Power = int(get1['response_value'])
-                        #if Electric_Power >= 1:
-                        #    print("Charging_success")
-                        #else:
-                        #    print("charging_error")
-                        # ここまでが本来の動き
-
-                        # ここからが一時的な処置。2分待つ。この間に実機の操作をする。
-                        print("1min_waiting")
-                        time.sleep(60)
-                        payload_get = getting("operationMode")  # 実機操作後のモード取得。
+                        
+                        payload_set = setting("operationMode=charging")
+                        try_set()
+                        if get1['response_result'] == "NG":
+                            print("Setting_OperationMode_error")
+                        else:
+                            print("Setting_OperationMode_success")
+                        time.sleep(20)
+                        payload_get = getting("instantaneousChargingAndDischargingElectricPower")
                         try_get()
-                        # response_valueがchargingになっていれば、成功を出す。
-                        if get1["response_value"] == "charging" or "auto":
+                        Electric_Power = int(get1['response_value'])
+                        if Electric_Power >= 1:
+                            print("Charging_success")
+                        else:
+                            print("charging_error")
+                 
+                        if get1["response_value"] == "charging":
                             print("Setting_OperationMode_success")
                             time.sleep(20)
                             payload_get = getting("instantaneousChargingAndDischargingElectricPower")
@@ -281,17 +274,16 @@ def run_charging_method():
                 else:
                     print("Getting_RemainingCapacity3_success")
                     RemainingCapacity3 = int(get1['response_value'])
-                    if RemainingCapacity3<=95:
-                        #2分待つ。この間に実機の操作をする。
-                        print("1min_waiting")
-                        time.sleep(60)
-                        #ここから本来の動き
-                        #payload_set=setting("operationMode=charging")
-                        #try_set()
-                        #if 'response_result'=="NG":
-                            #print("Setting_OperationMode_error")
-                        #else:
-                            #print("Setting_OperationMode_success")
+                    if RemainingCapacity3<=90:
+                       
+                    
+                        
+                        payload_set=setting("operationMode=charging")
+                        try_set()
+                        if 'response_result'=="NG":
+                            print("Setting_OperationMode_error")
+                        else:
+                            print("Setting_OperationMode_success")
                         payload_get=getting("operationMode") #実機操作後のモード取得。
                         try_get()
                         #response_valueがchargingになっていれば、成功を出す。

@@ -144,10 +144,7 @@ try_get()
 payload_set=setting("operationMode=standby")
 try_set()
 
-time.sleep(180)
-#3分経ったことをprintする
-print("3 minutes passed")
-time.sleep(180)
+
 
 payload_get=getting("instantaneousChargingAndDischargingElectricPower")
 try_get()
@@ -161,10 +158,8 @@ try_get()
 payload_set=setting("operationMode=discharging")
 try_set()
 
-time.sleep(180)
-#3分経ったことをprintする
-print("3 minutes passed")
-time.sleep(180)
+time.sleep(30)
+
 
 payload_get=getting("instantaneousChargingAndDischargingElectricPower")
 try_get()
@@ -178,10 +173,21 @@ try_get()
 payload_set=setting("operationMode=charging")
 try_set()
 
-time.sleep(180)
-#3分経ったことをprintする
-print("3 minutes passed")
-time.sleep(180)
+time.sleep(30)
+
+payload_get=getting("instantaneousChargingAndDischargingElectricPower")
+try_get()
+
+payload_get=getting("operationMode")
+try_get()
+
+payload_get=getting("actualOperationMode")
+try_get()
+
+payload_set=setting("operationMode=standby")
+try_set()
+
+
 
 payload_get=getting("instantaneousChargingAndDischargingElectricPower")
 try_get()
