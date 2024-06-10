@@ -9,4 +9,4 @@ setuptools==69.0.3
 smmap==5.0.1
 urllib3==2.2.0
 wheel==0.42.0
-pytz==2024.1
+pytz==2021.3

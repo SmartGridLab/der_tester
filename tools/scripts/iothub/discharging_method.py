@@ -17,7 +17,7 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
-import pytz
+import pytz # type: ignore
 
 
 #放電メソッドの実行

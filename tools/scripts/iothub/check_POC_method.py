@@ -45,25 +45,7 @@ def run_check_POC_method():
         }
         return payload_get
 
-    #setのpayloadを簡単に作成するための関数
-    def setting(setvalue):
-        payload_set = {
-        "requests": [
-            {
-            "command": [
-                {
-                "command_type": "character", 
-                "command_code": "set_property_value",
-                "command_value": setvalue}
-            ],
-
-            "driver_id": os.environ['DRIVER_ID'],
-            "r_edge_id": os.environ['R_EDGE_ID'],
-            "thing_uuid": os.environ['THING_UUID']
-            } 
-        ]
-        }
-        return payload_set
+    
     #ヘッダーの指定
     headers = {
     "Content-type": "application/json",
@@ -106,35 +88,7 @@ def run_check_POC_method():
             pass
             time.sleep(5)
     
-    def try_set():
-        
-        try:
-            response_set1 = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
-            print(response_set1.text)
-            jsonData = response_set1.json()
-            #リクエストを行い、get1に入れる。最後にget1が欲しい値になるために、reversed()を使って逆順にしている。
-            for result in reversed(jsonData['results']):
-                for command in reversed(result["command"]):
-                    for response in reversed(command["response"]):
-                        #辞書型set1の中身
-                        set1 = {
-                            'command_code': command["command_code"],
-                            'command_value': command["command_value"],
-                            'response_result': response["response_result"],
-                            'response_value': response["response_value"]
-                        }
-                        #set1の中身をprint()で表示
-                        print(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})")
-                        #print()の中身をtxtファイルに書き込む
-                        with open('log.txt', mode='a') as f:
-                            f.write(f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})\n")
-        except TimeoutError:
-            print("set1 is timed out")
-            #print()の中身をtxtファイルに書き込む
-            with open('log.txt', mode='a') as f:
-                f.write("set1 is timed out\n")
-            pass
-            time.sleep(5)
+   
 
     #電力を取得する
     payload_get=getting("instantaneousChargingAndDischargingElectricPower")

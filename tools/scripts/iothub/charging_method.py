@@ -17,7 +17,7 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
-import pytz
+import pytz  # type: ignore
 
 #充電メソッドを実行する関数
 def run_charging_method():
