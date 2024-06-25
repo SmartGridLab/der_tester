@@ -205,14 +205,14 @@ def run_discharging_method():
                  return "ERROR"
                 #operationModeがchargingの場合
              else:
-                #POC残量を取得する
+                #SOC残量を取得する
                  payload_get=getting("remainingCapacity3")
                  try_get()
-                    #POC残量取得NGの場合
+                    #SOC残量取得NGの場合
                  if get1['response_result']=="NG":
                      print("Getting_RemainingCapacity3_error")
                      return "ERROR"
-                    #POC残量取得OKの場合
+                    #SOC残量取得OKの場合
                  else:
                      print("Getting_RemainingCapacity3_success")
                      RemainingCapacity3 = int(get1['response_value'])

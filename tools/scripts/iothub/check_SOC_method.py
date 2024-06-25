@@ -1,4 +1,4 @@
-#PoCと現在の充放電状態、電力を取得するコード
+#SoCと現在の充放電状態、電力を取得するコード
 #動作：１.瞬時電力を取得し、実機の状態（充放電or待機)を確認する。
 #　　　２.getした値と実機の状態が一致しているか確認する。
 #　　　３.一致している場合はSOCを取得し下記の戻り値を返す。
@@ -16,8 +16,8 @@ import os
 from dotenv import load_dotenv
 import time
 import sys
-#POCチェックメソッドの実行
-def run_check_POC_method():
+#SOCチェックメソッドの実行
+def run_check_SOC_method():
     # .envファイルの読み込み
     load_dotenv()
     # URLの指定
@@ -234,4 +234,4 @@ def run_check_POC_method():
 
                 
 if __name__ == "__main__":
-    run_check_POC_method()               
+    run_check_SOC_method()               
