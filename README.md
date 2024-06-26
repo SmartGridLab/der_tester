@@ -13,3 +13,4 @@ Tester to control various distributed energy resources (DERs) for DER service bu
 [Google Drive](https://drive.google.com/drive/folders/196UOfYqHFDTonQh8NCdOVm2RNF1meveH?usp=sharing)に集積していきます。  
 欲しい論文があれば、slackの **# 欲しい論文リクエスト** で荒井さんにリクエストしてください。暇があれば小平も渡します。  
 
+[強化学習とのI/Fの図](https://boardmix.com/app/share/CAE.CNX6ICAFKhZLQnc3cUZVU0ctYkJUUU9CVGJJWDBnMAVAAQ，リンクをクリックして、Boardmix)
