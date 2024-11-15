@@ -47,12 +47,12 @@
 #   出力: str: 待機状態への切り替え結果を示すコード
 #     - "SS01"：待機状態への切り替えが成功した場合
 #     - "ERROR"：待機モード設定が失敗した場合
-import datetime
 import requests
 import os
 from dotenv import load_dotenv
 import time
 import pytz
+from datetime import datetime
 
 class BatteryManager:
     def __init__(self, max_kwh_capacity, initial_soc, max_charging_power, max_discharging_power):
@@ -70,6 +70,7 @@ class BatteryManager:
         self.current_kwh_capacity = (initial_soc / 100) * max_kwh_capacity
         self.max_charging_power = max_charging_power
         self.max_discharging_power = max_discharging_power
+
     def create_get_payload(self, get_value):
         return {
             "requests": [
@@ -106,41 +107,99 @@ class BatteryManager:
             ]
         }
 
+
+
     def try_get(self, payload):
         try:
             response = requests.request("POST", self.url, headers=self.headers, json=payload, timeout=20)
             json_data = response.json()
-            for result in reversed(json_data['results']):
-                for command in reversed(result["command"]):
-                    for response in reversed(command["response"]):
-                        return {
-                            'command_code': command["command_code"],
-                            'command_value': command["command_value"],
-                            'response_result': response["response_result"],
-                            'response_value': response["response_value"]
-                        }
-        except TimeoutError:
+            for result in (json_data['results']):
+                for command in (result["command"]):
+                    for response_item in (command["response"]):
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        if response_item["response_result"] == "NG":
+                            log_entry = (
+                                f"[{timestamp}] GET Failed: command_code={command['command_code']}, "
+                                f"command_value={command['command_value']}, "
+                                f"response_result={response_item['response_result']}, "
+                                f"response_value={response_item['response_value']}\n"
+                            )
+                            with open('log.txt', mode='a') as f:
+                                f.write(log_entry)
+                            return None
+                        else:
+                            log_entry = (
+                                f"[{timestamp}] GET Success: command_code={command['command_code']}, "
+                                f"command_value={command['command_value']}, "
+                                f"response_result={response_item['response_result']}, "
+                                f"response_value={response_item['response_value']}\n"
+                            )
+                            with open('log.txt', mode='a') as f:
+                                f.write(log_entry)
+                            return {
+                                'command_code': command["command_code"],
+                                'command_value': command["command_value"],
+                                'response_result': response_item["response_result"],
+                                'response_value': response_item["response_value"]
+                            }
+        except requests.exceptions.Timeout:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             with open('log.txt', mode='a') as f:
-                f.write("GET request timed out\n")
+                f.write(f"[{timestamp}] GET request timed out\n")
+            return None
+        except Exception as e:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open('log.txt', mode='a') as f:
+                f.write(f"[{timestamp}] GET request failed with exception: {e}\n")
             return None
 
     def try_set(self, payload):
         try:
             response = requests.request("POST", self.url, headers=self.headers, json=payload, timeout=20)
             json_data = response.json()
-            for result in reversed(json_data['results']):
-                for command in reversed(result["command"]):
-                    for response in reversed(command["response"]):
-                        return {
-                            'command_code': command["command_code"],
-                            'command_value': command["command_value"],
-                            'response_result': response["response_result"],
-                            'response_value': response["response_value"]
-                        }
-        except TimeoutError:
+            for result in (json_data['results']):
+                for command in (result["command"]):
+                    for response_item in (command["response"]):
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        if response_item["response_result"] == "NG":
+                            log_entry = (
+                                f"[{timestamp}] SET Failed: command_code={command['command_code']}, "
+                                f"command_value={command['command_value']}, "
+                                f"response_result={response_item['response_result']}, "
+                                f"response_value={response_item['response_value']}\n"
+                            )
+                            with open('log.txt', mode='a') as f:
+                                f.write(log_entry)
+                            return None
+                        else:
+                            log_entry = (
+                                f"[{timestamp}] SET Success: command_code={command['command_code']}, "
+                                f"command_value={command['command_value']}, "
+                                f"response_result={response_item['response_result']}, "
+                                f"response_value={response_item['response_value']}\n"
+                            )
+                            with open('log.txt', mode='a') as f:
+                                f.write(log_entry)
+                            return {
+                                'command_code': command["command_code"],
+                                'command_value': command["command_value"],
+                                'response_result': response_item["response_result"],
+                                'response_value': response_item["response_value"]
+                            }
+        except requests.exceptions.Timeout:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             with open('log.txt', mode='a') as f:
-                f.write("SET request timed out\n")
+                f.write(f"[{timestamp}] SET request timed out\n")
             return None
+        except Exception as e:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open('log.txt', mode='a') as f:
+                f.write(f"[{timestamp}] SET request failed with exception: {e}\n")
+            return None
+
+
+
+
     def monitor_SoC_Method(self):
         power_interval_hours = 30 / 3600  # 30秒を時間に換算
         last_remaining_capacity = None  # 前回のremainingCapacity3の値を保存
@@ -253,3 +312,14 @@ class BatteryManager:
             return "SS01"
         else:
             return "ERROR"
+    def SOC_Check(self):
+        payload = self.create_get_payload("remainingCapacity3")
+        response = self.try_get(payload)
+
+        if response is None or response['response_result'] == "NG":
+            print("Error occurred in retrieving SoC. Monitoring failed.")
+            return "ERROR"
+
+        return {
+            'RemainingCapacity3': response['response_value']
+        }

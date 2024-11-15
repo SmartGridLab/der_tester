@@ -1,14 +1,14 @@
-import csv
 import threading
-from collections import defaultdict
 from Battery import BatteryManager
+from CSV_Parser import extract_soc_bid_data  # CSV抽出用の関数をインポート
 import time
 
 # 最大KWh容量、初期SoC値、および最大充放電電力の設定
-max_kwh_capacity = 15  # 例として15 KWhの最大容量
-initial_soc = 50  # 初期のSoC値を50%に設定
-max_charging_power = 120  # 最大充電電力（W）
-max_discharging_power = 100  # 最大放電電力（W）
+max_kwh_capacity = 4.2  # 例として15 KWhの最大容量
+initial_soc = 80  # 初期のSoC値を50%に設定
+max_charging_power = 400  # 最大充電電力（W）
+max_discharging_power = 300  # 最大放電電力（W）
+
 
 # BatteryManagerのインスタンスを作成
 battery_manager = BatteryManager(
@@ -17,21 +17,6 @@ battery_manager = BatteryManager(
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power
 )
-
-def extract_soc_bid_data(file_path):
-    soc_bid_data = defaultdict(list)
-    with open(file_path, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            year = row['year']
-            month = row['month']
-            day = row['day']
-            hour = row['hour']
-            soc_bid = row['SoC_bid[%]']
-            time_key = (year, month, day, hour)
-            soc_bid_data[time_key].append(soc_bid)
-    
-    return dict(soc_bid_data)
 
 def monitor_power_thread():
     battery_manager.monitor_SoC_Method()

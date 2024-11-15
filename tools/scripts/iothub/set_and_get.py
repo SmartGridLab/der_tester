@@ -27,7 +27,7 @@ payload_get = {
         "command_type": "character",
         "command_code": "get_property_value",
         #get内容の設定
-        "command_value": "actualOperationMode"
+        "command_value": "batteryHealthState"
         }
       ],
       #######
