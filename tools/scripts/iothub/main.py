@@ -1,14 +1,13 @@
 import threading
 from Battery import BatteryManager
 from CSV_Parser import extract_soc_bid_data  # CSV抽出用の関数をインポート
-import time
+from datetime import datetime
 
 # 最大KWh容量、初期SoC値、および最大充放電電力の設定
 max_kwh_capacity = 4.2  # 例として15 KWhの最大容量
 initial_soc = 80  # 初期のSoC値を50%に設定
 max_charging_power = 400  # 最大充電電力（W）
 max_discharging_power = 300  # 最大放電電力（W）
-
 
 # BatteryManagerのインスタンスを作成
 battery_manager = BatteryManager(
@@ -17,6 +16,19 @@ battery_manager = BatteryManager(
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power
 )
+
+def log_action_start(action):
+    """
+    実行内容をログに記録する関数。
+    
+    Args:
+    action (str): 実行するアクション名（"edge" または "smooth"）
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] Starting {action.capitalize()} Control Mode\n"
+    with open('controller_log.txt', mode='a') as f:
+        f.write(log_entry)
+    print(log_entry.strip())
 
 def monitor_power_thread():
     battery_manager.monitor_SoC_Method()
@@ -67,6 +79,9 @@ soc_bid_data = extract_soc_bid_data(file_path)
 
 # ユーザーが選択した制御モードに応じて関数を実行
 mode = input("Enter control mode ('edge' or 'smooth'): ").strip().lower()
+
+# 実行内容をログに記録
+log_action_start(mode)
 
 monitor_thread = threading.Thread(target=monitor_power_thread, daemon=True)
 monitor_thread.start()
