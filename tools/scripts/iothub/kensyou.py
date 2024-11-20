@@ -132,28 +132,6 @@ def try_set():
        pass
        time.sleep(5)
 
-payload_get=getting("instantaneousChargingAndDischargingElectricPower")
-try_get()
-
-payload_get=getting("operationMode")
-try_get()
-
-payload_get=getting("actualOperationMode")
-try_get()
-
-payload_set=setting("operationMode=standby")
-try_set()
-
-
-
-payload_get=getting("instantaneousChargingAndDischargingElectricPower")
-try_get()
-
-payload_get=getting("operationMode")
-try_get()
-
-payload_get=getting("actualOperationMode")
-try_get()
 
 payload_set=setting("operationMode=discharging")
 try_set()

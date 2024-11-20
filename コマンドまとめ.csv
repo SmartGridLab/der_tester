@@ -1,0 +1,19 @@
+﻿Property                                 Description (Japanese)                   Writable  Observable  Schema                                                   EPC   Description (English)
+---------------------------------------------------------------------------------------------------------------------------
+acEffectiveChargingCapacity             AC実効容量 (充電)                       FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA0  AC effective capacity (charging)
+acEffectiveDischargingCapacity          AC実効容量 (放電)                       FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA1  AC effective capacity (discharging)
+acChargeableCapacity                    AC充電可能容量                          FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA2  AC chargeable capacity
+acDischargeableCapacity                 AC放電可能容量                          FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA3  AC dischargeable capacity
+acChargeableElectricEnergy              AC充電可能量                            FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA4  AC chargeable electric energy
+acDischargeableElectricEnergy           AC放電可能量                            FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xA5  AC dischargeable electric energy
+acChargeUpperLimit                      AC充電上限設定                          TRUE      FALSE       number (%), min: 0, max: 100                           0xA6  AC charge upper limit setting
+acDischargeLowerLimit                   AC放電下限設定                          TRUE      FALSE       number (%), min: 0, max: 100                           0xA7  AC discharge lower limit setting
+acCumulativeChargingElectricEnergy      AC積算充電電力量計測値                  FALSE     FALSE       number (kWh), min: 0, max: 999999.999, multipleOf: 0.001 0xA8  AC measured cumulative charging electric energy
+acCumulativeDischargingElectricEnergy   AC積算放電電力量計測値                  FALSE     FALSE       number (kWh), min: 0, max: 999999.999, multipleOf: 0.001 0xA9  AC measured cumulative discharging electric energy
+acTargetChargingElectricEnergy          AC充電量設定値                          TRUE      TRUE        number (Wh), min: 1, max: 999999999 or "noSetting"     0xAA  AC charge amount setting value
+acTargetDischargingElectricEnergy       AC放電量設定値                          TRUE      TRUE        number (Wh), min: 1, max: 999999999 or "noSetting"     0xAB  AC discharge amount setting value
+chargingMethod                          充電方式                                TRUE      TRUE        string, enum: ["maximum", "surplus", "designatedPower", 0xC1  Charging method
+dischargingMethod                       放電方式                                TRUE      TRUE        string, enum: ["maximum", "loadFollowing", "designated 0xC2  Discharging method
+acRatedElectricEnergy                   AC定格電力量                            FALSE     FALSE       number (Wh), min: 0, max: 999999999                    0xC7  AC rated electric energy
+minimumAndMaximumChargingElectricPower  最小最大充電電力値                      FALSE     FALSE       object, properties: { minValue: number (W), maxValue   0xC8  Minimum/maximum charging electric power
+minimumAndMaximumDischargingElectricPower 最小最大放電電力値                    FALSE     FALSE       object, properties: { minValue: number (W), maxValue   0xC9  Minimum/maximum discharging electric power
