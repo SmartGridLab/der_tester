@@ -1,13 +1,19 @@
 import threading
+import time
 from Battery import BatteryManager
 from CSV_Parser import extract_soc_bid_data  # CSV抽出用の関数をインポート
 from datetime import datetime
+import pytz
+
+# タイムゾーン設定
+JST = pytz.timezone('Asia/Tokyo')
 
 # 最大KWh容量、初期SoC値、および最大充放電電力の設定
-max_kwh_capacity = 4.2  # 例として15 KWhの最大容量
-initial_soc = 80  # 初期のSoC値を50%に設定
+max_kwh_capacity = 3.6  # 蓄電池の最大容量（KWh）
+initial_soc = 80  # 初期のSoC値を80%に設定
 max_charging_power = 400  # 最大充電電力（W）
 max_discharging_power = 300  # 最大放電電力（W）
+efficiency = 0.95  # 充放電効率（95%）
 
 # BatteryManagerのインスタンスを作成
 battery_manager = BatteryManager(
@@ -24,14 +30,71 @@ def log_action_start(action):
     Args:
     action (str): 実行するアクション名（"edge" または "smooth"）
     """
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"[{timestamp}] Starting {action.capitalize()} Control Mode\n"
-    with open('controller_log.txt', mode='a') as f:
+    with open('log.txt', mode='a') as f:
         f.write(log_entry)
     print(log_entry.strip())
 
+def calculate_predicted_soc(current_soc, power_w, duration_s, efficiency):
+    """
+    SOC予測値を計算する関数。
+    
+    Args:
+    current_soc (float): 現在のSOC（%）
+    power_w (int): 充放電電力（W）
+    duration_s (int): 継続時間（秒）
+    efficiency (float): 充放電効率（0～1）
+    
+    Returns:
+    float: 予測SOC（%）
+    """
+    delta_kwh = (power_w / 1000) * (duration_s / 3600) * efficiency
+    new_kwh_capacity = battery_manager.current_kwh_capacity + delta_kwh
+    new_soc = (new_kwh_capacity / max_kwh_capacity) * 100
+    return max(0, min(100, new_soc))  # SOCは0～100%に制限
+
 def monitor_power_thread():
-    battery_manager.monitor_SoC_Method()
+    """
+    モニタリングスレッド。
+    SOC予測値を計算し、ログおよび出力。
+    """
+    while True:
+        # 充放電電力を取得
+        power_payload = battery_manager.create_get_payload("instantaneousChargingAndDischargingElectricPower")
+        power_response = battery_manager.try_get(power_payload)
+
+        if power_response is None or power_response['response_result'] == "NG":
+            print("Error occurred in retrieving power. Monitoring failed.")
+            return "ERROR"
+
+        # 現在のSOCを取得
+        soc_payload = battery_manager.create_get_payload("remainingCapacity3")
+        soc_response = battery_manager.try_get(soc_payload)
+
+        if soc_response is None or soc_response['response_result'] == "NG":
+            print("Error occurred in retrieving SoC. Monitoring failed.")
+            return "ERROR"
+
+        # 現在の値を取得
+        current_power = int(power_response['response_value'])
+        current_soc = float(soc_response['response_value'])
+
+        # SOC予測値を計算
+        predicted_soc = calculate_predicted_soc(current_soc, current_power, 30, efficiency)
+
+        # 結果を出力およびログ
+        timestamp = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = (
+            f"[{timestamp}] Current SOC: {current_soc:.2f}%, "
+            f"Power: {current_power}W, Predicted SOC: {predicted_soc:.2f}%\n"
+        )
+        with open('log.txt', mode='a') as f:
+            f.write(log_entry)
+        print(log_entry.strip())
+
+        # 30秒待機
+        time.sleep(30)
 
 def run_controller_edge(soc_bid_data):
     for time_key, soc_bids in soc_bid_data.items():
