@@ -3,8 +3,8 @@ from collections import defaultdict
 
 def extract_soc_bid_data(file_path):
     """
-    CSVファイルからSoC_bidデータを抽出し、時間キー（日、時、30分または00分）を使用して辞書に格納する。
-    
+    CSVファイルからSoC_bidデータを抽出し、時間キー（"hour:minute"形式）を使用して辞書に格納する。
+
     Args:
     file_path (str): CSVファイルのパス
 
@@ -15,15 +15,18 @@ def extract_soc_bid_data(file_path):
     with open(file_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            day = row['day']
             hour = row['hour']
             minute = row['minute']
-            soc_bid = row['SoC_bid[%]']
-            
-            # Create a key using day, hour, and minute
-            time_key = (day, hour, minute)
-            
-            # Append the SoC_bid value to the list corresponding to the key
+            soc_bid = row['SoC(実需給)']
+
+            # 空データをスキップ
+            if not soc_bid:
+                continue
+
+            # 時間キーを作成
+            time_key = f"{int(hour)}:{int(minute):02d}"
+
+            # SoC_bid値を追加
             soc_bid_data[time_key].append(float(soc_bid))
     
     return dict(soc_bid_data)

@@ -9,14 +9,14 @@ JST = pytz.timezone('Asia/Tokyo')
 
 # 最大KWh容量、初期SoC値、および最大充放電電力の設定
 max_kwh_capacity = 3.6  # 例: 3.6 KWhの最大容量
-max_charging_power = 1000  # 最大充電電力（W）
-max_discharging_power = 500  # 最大放電電力（W）
+max_charging_power = 2400  # 最大充電電力（W）
+max_discharging_power = 2400  # 最大放電電力（W）
 efficiency = 0.95  # 充放電効率（95%）
 
 # BatteryManagerのインスタンスを作成
 battery_manager = BatteryManager(
     max_kwh_capacity=max_kwh_capacity,
-    initial_soc=50,  # 初期値はSOC_Checkで再取得
+    initial_soc=100,  # 初期値はSOC_Checkで再取得
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power
 )
@@ -84,6 +84,8 @@ def range_charge(end_soc, log_file):
         soc = float(soc_result['RemainingCapacity3'])
 
         if soc >= end_soc:
+            print(f"Target SOC of {end_soc}% reached. Stopping charging.")
+            battery_manager.standby_method()  # Set the battery to standby mode
             break
 
         power_response = battery_manager.try_get(
@@ -91,6 +93,7 @@ def range_charge(end_soc, log_file):
         )
         if power_response is None or power_response['response_result'] == "NG":
             print("Error occurred while retrieving power data during charging.")
+            battery_manager.standby_method()  # Stop charging on error
             break
 
         power = int(power_response['response_value'])
@@ -98,7 +101,7 @@ def range_charge(end_soc, log_file):
         log_data("charging", soc, power, predicted_soc, log_file)
         battery_manager.charging_method(max_charging_power)
 
-    print(f"Charging completed to {end_soc}%.")
+    print(f"Charging process stopped at {soc:.2f}%. Target was {end_soc}%.")
 
 def range_discharge(end_soc, log_file):
     log_operation_start("discharging", end_soc, log_file)
@@ -110,6 +113,8 @@ def range_discharge(end_soc, log_file):
         soc = float(soc_result['RemainingCapacity3'])
 
         if soc <= end_soc:
+            print(f"Target SOC of {end_soc}% reached. Stopping discharging.")
+            battery_manager.standby_method()  # Set the battery to standby mode
             break
 
         power_response = battery_manager.try_get(
@@ -117,6 +122,7 @@ def range_discharge(end_soc, log_file):
         )
         if power_response is None or power_response['response_result'] == "NG":
             print("Error occurred while retrieving power data during discharging.")
+            battery_manager.standby_method()  # Stop discharging on error
             break
 
         power = int(power_response['response_value'])
@@ -124,7 +130,9 @@ def range_discharge(end_soc, log_file):
         log_data("discharging", soc, power, predicted_soc, log_file)
         battery_manager.discharging_method(max_discharging_power)
 
-    print(f"Discharging completed to {end_soc}%.")
+    print(f"Discharging process stopped at {soc:.2f}%. Target was {end_soc}%.")
+
+
 
 def plot_charge_discharge_log_realtime(log_file):
     plt.ion()  # インタラクティブモードをオンに
