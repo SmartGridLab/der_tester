@@ -11,18 +11,16 @@ JST = pytz.timezone('Asia/Tokyo')
 # 設定値
 charging_capacity_kwh = 4.4  # 充電時の実測容量 (kWh)
 discharging_capacity_kwh = 3.7  # 放電時の実測容量 (kWh)
-max_charging_power = 2400  # 最大充電電力（W）
-max_discharging_power = 2400  # 最大放電電力（W）
+max_charging_power = 2400  # 最大充電電力(W)
+max_discharging_power = 2400  # 最大放電電力(W)
 
-# BatteryManagerのインスタンスを作成
 battery_manager = BatteryManager(
-    max_kwh_capacity=discharging_capacity_kwh,  # 初期値として放電容量を設定
-    initial_soc=0,  # 後でログまたは初期値から設定
+    max_kwh_capacity=discharging_capacity_kwh,
+    initial_soc=0,
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power
 )
 
-# ログ記録関数
 def write_log(log_file, start_time, current_soc, target_soc, predicted_soc, power, status):
     elapsed_time = datetime.now(JST) - start_time
     elapsed_hours = elapsed_time.seconds // 3600
@@ -34,25 +32,23 @@ def write_log(log_file, start_time, current_soc, target_soc, predicted_soc, powe
         writer = csv.writer(csvfile)
         writer.writerow([elapsed, current_soc, target_soc, predicted_soc, power, status])
 
-# 積分的にSOC予測値を計算する関数
 def calculate_predicted_soc(current_soc, power_w, elapsed_time_seconds, previous_predicted_soc):
     max_capacity = charging_capacity_kwh if power_w > 0 else discharging_capacity_kwh
     previous_kwh = (previous_predicted_soc / 100) * max_capacity
-    delta_kwh = (power_w * elapsed_time_seconds) / (3600 * 1000)  # kWh単位に変換
+    delta_kwh = (power_w * elapsed_time_seconds) / (3600 * 1000)
     new_kwh = previous_kwh + delta_kwh
     new_soc = (new_kwh / max_capacity) * 100
     return max(0, min(100, new_soc))
 
 def run_controller_smooth(soc_bid_list, log_file, start_time):
-    predicted_soc = 0.0  # 初期予測SOC
+    predicted_soc = 0.0
     last_log_time = start_time
 
     for index, soc_bid in enumerate(soc_bid_list):
         target_soc = soc_bid['soc_bid']
-        duration_s = 1800  # 30分間の制御サイクル
+        duration_s = 1800  # 30分
 
-        # --- 30分サイクル開始時に一度だけ計算と設定を行う ---
-        # 現在のSOCとパワー取得
+        # サイクル開始時に1回計算
         soc_result = battery_manager.SOC_Check()
         if soc_result == "ERROR":
             continue
@@ -66,47 +62,53 @@ def run_controller_smooth(soc_bid_list, log_file, start_time):
             continue
         power = int(power_response['response_value'])
 
-        # 情報がすべて揃った時点の時刻で経過時間を計算
         now_time = datetime.now(JST)
         elapsed_time_seconds = (now_time - last_log_time).total_seconds()
 
-        # 予測SOC更新
         predicted_soc = calculate_predicted_soc(current_soc, power, elapsed_time_seconds, predicted_soc)
 
-        # 必要な充放電電力をサイクル開始時に決定
         soc_difference = target_soc - predicted_soc
-        if soc_difference > 0:
-            # 充電が必要
-            required_power = round((soc_difference / 100) * charging_capacity_kwh * 1000 / (duration_s / 3600))
-            battery_manager.charging_method(required_power)
-            status = "Charging"
-        elif soc_difference < 0:
-            # 放電が必要
-            required_power = round((abs(soc_difference) / 100) * discharging_capacity_kwh * 1000 / (duration_s / 3600))
-            battery_manager.discharging_method(required_power)
-            status = "Discharging"
-        else:
-            # 差が0なら待機
-            required_power = 0
+
+        # 0.5%以下なら充放電せず30分間Standby
+        if abs(soc_difference) <= 0.5:
+            # Standby状態で30分過ごす
             battery_manager.standby_method()
+            operation_mode = "Standby"
             status = "Standby"
+            required_power = 0
+        else:
+            # 従来通り充放電を決定
+            if soc_difference > 0:
+                required_power = round((soc_difference / 100) * charging_capacity_kwh * 1000 / (duration_s / 3600))
+                battery_manager.charging_method(required_power)
+                operation_mode = "Charging"
+                status = "Charging"
+            elif soc_difference < 0:
+                required_power = round((abs(soc_difference) / 100) * discharging_capacity_kwh * 1000 / (duration_s / 3600))
+                battery_manager.discharging_method(required_power)
+                operation_mode = "Discharging"
+                status = "Discharging"
+            else:
+                required_power = 0
+                battery_manager.standby_method()
+                operation_mode = "Standby"
+                status = "Standby"
 
         cycle_start_time = datetime.now(JST)
-        # ログ出力（既に情報は取得済み、elapsed_time_seconds算出済み）
         write_log(log_file, start_time, current_soc, target_soc, predicted_soc, power, status)
-        last_log_time = cycle_start_time  # ログ記録後の時刻をlast_log_timeに
+        last_log_time = cycle_start_time
 
-        # --- 小ループ開始（約20秒ごと） ---
-        standby_mode_engaged = False  # 目標達成後一度だけstandbyを送るためのフラグ
+        standby_mode_engaged = False
+        last_known_battery_soc = current_soc
+
+        # 小ループ
         while True:
-            # 現在のSOCを取得
             soc_result = battery_manager.SOC_Check()
             if soc_result == "ERROR":
                 time.sleep(5)
                 continue
             current_soc = float(soc_result['RemainingCapacity3'])
 
-            # 実際の充放電電力を1回だけ取得
             power_response = battery_manager.try_get(
                 battery_manager.create_get_payload("instantaneousChargingAndDischargingElectricPower")
             )
@@ -116,39 +118,55 @@ def run_controller_smooth(soc_bid_list, log_file, start_time):
                 continue
             power = int(power_response['response_value'])
 
-            # 全情報取得後の時刻
             now_time = datetime.now(JST)
             elapsed_time_seconds = (now_time - last_log_time).total_seconds()
 
-            # 予測SOC更新（観測値power使用）
-            predicted_soc = calculate_predicted_soc(current_soc, power, elapsed_time_seconds, predicted_soc)
+            # CurrentSOCに変化があった場合、PredictedSOCをCurrentSOCに合わせる
+            if current_soc != last_known_battery_soc:
+                predicted_soc = current_soc
+            else:
+                predicted_soc = calculate_predicted_soc(current_soc, power, elapsed_time_seconds, predicted_soc)
 
-            # 目標SOC達成判定
-            if predicted_soc >= target_soc:
-                # 一度だけStandbyを送る（まだ送っていなければ）
-                if not standby_mode_engaged:
-                    battery_manager.standby_method()
-                    status = "Standby"
-                    standby_mode_engaged = True
-                else:
-                    # すでにStandby中ならモード変更は不要
-                    status = "Standby"
-            # 目標未達ならstatusは前サイクルのまま(ChargingやDischargingのまま)
+            last_known_battery_soc = current_soc
 
-            # ログ書き込み
+            # 0.5%以下でStandbyの場合、あるいは既に目標達成でStandby中なら特に充放電はしない
+            if operation_mode == "Standby":
+                # 常にStandby
+                status = "Standby"
+            else:
+                # 目標SOC達成判定
+                if operation_mode == "Charging":
+                    if predicted_soc >= target_soc:
+                        if not standby_mode_engaged:
+                            battery_manager.standby_method()
+                            status = "Standby"
+                            standby_mode_engaged = True
+                        else:
+                            status = "Standby"
+                    else:
+                        status = "Charging"
+                elif operation_mode == "Discharging":
+                    if predicted_soc <= target_soc:
+                        if not standby_mode_engaged:
+                            battery_manager.standby_method()
+                            status = "Standby"
+                            standby_mode_engaged = True
+                        else:
+                            status = "Standby"
+                    else:
+                        status = "Discharging"
+
             write_log(log_file, start_time, current_soc, target_soc, predicted_soc, power, status)
             last_log_time = datetime.now(JST)
 
-            # 30分経過で次のサイクルへ
+            # 30分経過
             if (datetime.now(JST) - cycle_start_time).total_seconds() >= duration_s:
-                # 次のSOCビッドへ
                 if index + 1 < len(soc_bid_list):
                     start_time = datetime.now(JST)
                 break
 
             time.sleep(5)
 
-# CSVファイルからSOCビッドデータを抽出
 def extract_soc_bid_data(file_path):
     soc_bid_list = []
     with open(file_path, mode='r', newline='') as csvfile:
@@ -161,23 +179,21 @@ def extract_soc_bid_data(file_path):
             })
     return soc_bid_list
 
-# ログファイルから最新SOCを取得
 def get_last_soc_from_log(log_file):
     try:
         with open(log_file, mode='r') as csvfile:
             reader = csv.reader(csvfile)
-            next(reader)  # ヘッダーをスキップ
+            next(reader)
             rows = list(reader)
             if rows:
                 last_row = rows[-1]
-                return float(last_row[1])  # 現在のSOCを取得 (Current SOCは2列目)
+                return float(last_row[1])
     except Exception as e:
         print(f"Error reading log file: {e}")
     return None
 
-# メイン関数
 def main():
-    file_path = '/workspaces/der_tester/tools/scripts/iothub/result_dataframe.csv'
+    file_path = r'/workspaces/der_tester/tools/scripts/iothub/result_dataframe1.csv'
     soc_bid_list = extract_soc_bid_data(file_path)
 
     log_file = input("Enter log file path (or press Enter to start a new log): ").strip()
