@@ -11,6 +11,7 @@ def plot_graphs(csv_file_path):
     times = []
     target_socs = []
     predicted_socs = []
+    correct_socs = []
     powers = []
 
     with open(csv_file_path, mode='r', newline='') as csvfile:
@@ -20,7 +21,7 @@ def plot_graphs(csv_file_path):
         for i, row in enumerate(reader):
             # 実際の列名に合わせて修正
             elapsed_str = row['ElapsedTime']
-            current_soc = float(row['CurrentSOC'])
+            current_soc = float(row['CurrentSOC'])      # Correct SOCとして描画
             target_soc = float(row['TargetSOC'])
             predicted_soc = float(row['PredictedSOC'])
             power = float(row['Power'])
@@ -36,33 +37,40 @@ def plot_graphs(csv_file_path):
             times.append(cumulative_time)
             target_socs.append(target_soc)
             predicted_socs.append(predicted_soc)
+            correct_socs.append(current_soc)
             powers.append(power)
 
             prev_seconds = current_seconds
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10,8), sharex=True)
-
-    # グラフ1: TargetSOC, PredictedSOC
+    # グラフ1: SOC系グラフ
+    fig1 = plt.figure(figsize=(10, 6))
+    ax1 = fig1.add_subplot(111)
     ax1.plot(times, target_socs, label='Target SOC', color='red')
     ax1.plot(times, predicted_socs, label='Predicted SOC', color='blue')
+    ax1.plot(times, correct_socs, label='Correct SOC', color='green')
     ax1.set_ylabel('SOC (%)')
     ax1.set_ylim(0, 100)
-    ax1.set_title('Target SOC vs Predicted SOC over Time')
+    ax1.set_title('SOC over Time')
     ax1.legend()
     ax1.grid(True)
+    plt.xlabel('Time (seconds)')
+    plt.tight_layout()
 
-    # グラフ2: Power
-    ax2.plot(times, powers, label='Power', color='green')
+    # グラフ2: Powerグラフ
+    fig2 = plt.figure(figsize=(10, 6))
+    ax2 = fig2.add_subplot(111)
+    ax2.plot(times, powers, label='Power', color='purple')
     ax2.set_ylabel('Power (W)')
     ax2.set_xlabel('Time (seconds)')
     ax2.set_ylim(-2400, 2400)
     ax2.set_title('Power over Time')
     ax2.legend()
     ax2.grid(True)
-
     plt.tight_layout()
+
+    # グラフを表示
     plt.show()
 
 if __name__ == "__main__":
-    csv_file_path = r"C:\Users\hayas\Desktop\local_test\新しいフォルダー (2)\data.csv"  # ログCSVファイルのパスに置き換えてください
+    csv_file_path = r"C:\Users\hayas\Desktop\ソツロン\データ類\実験系\ソツロンで使うやつ\graph_creater\パート１.csv"  # CSVファイルのパスを変更
     plot_graphs(csv_file_path)

@@ -133,7 +133,7 @@ def try_set():
        time.sleep(5)
 
 
-payload_set=setting("operationMode=discharging")
+payload_set=setting("operationMode=charging")
 try_set()
 
 time.sleep(30)
