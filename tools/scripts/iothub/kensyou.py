@@ -133,12 +133,18 @@ def try_set():
        time.sleep(5)
 
 
-payload_set=setting("operationMode=charging")
+#payload_set=setting("operationMode=discharging")
+#try_set()
+
+#time.sleep(30)
+
+#現在時刻をprint
+print(datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime("%Y/%m/%d %H:%M:%S"))
+
+
+payload_set=setting("operationMode=discharging")
 try_set()
-
-time.sleep(30)
-
-
+time.sleep(10)
 payload_get=getting("instantaneousChargingAndDischargingElectricPower")
 try_get()
 
@@ -148,7 +154,7 @@ try_get()
 payload_get=getting("actualOperationMode")
 try_get()
 
-payload_set=setting("operationMode=charging")
+payload_set=setting("operationMode=discharging")
 try_set()
 
 time.sleep(30)
