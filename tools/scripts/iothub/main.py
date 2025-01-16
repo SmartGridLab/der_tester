@@ -11,15 +11,15 @@ JST = pytz.timezone('Asia/Tokyo')
 # 設定値
 charging_capacity_kwh = 4.4  # 充電時の実測容量 (kWh)
 discharging_capacity_kwh = 3.7  # 放電時の実測容量 (kWh)
-max_charging_power = 2400  # 最大充電電力(W)
-max_discharging_power = 2400  # 最大放電電力(W)
+max_charging_power = 2500  # 最大充電電力(W)
+max_discharging_power = 2500  # 最大放電電力(W)
 
 
 battery_manager = BatteryManager(
     max_kwh_capacity=discharging_capacity_kwh,
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power,
-    initial_soc=100)
+    initial_soc=0)
 
 def write_log(log_file, start_time, current_soc, target_soc, predicted_soc, power, status):
     elapsed_time = datetime.now(JST) - start_time
@@ -193,7 +193,7 @@ def get_last_soc_from_log(log_file):
     return None
 
 def main():
-    file_path = r'/workspaces/der_tester/tools/scripts/iothub/Part3.csv'
+    file_path = r'/workspaces/der_tester/tools/scripts/iothub/Part1.csv'
     soc_bid_list = extract_soc_bid_data(file_path)
 
     log_file = input("Enter log file path (or press Enter to start a new log): ").strip()
