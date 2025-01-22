@@ -19,7 +19,7 @@ battery_manager = BatteryManager(
     max_kwh_capacity=discharging_capacity_kwh,
     max_charging_power=max_charging_power,
     max_discharging_power=max_discharging_power,
-    initial_soc=26.68)
+    initial_soc=21)
 
 def write_log(log_file, start_time, current_soc, target_soc, predicted_soc, power, status):
     elapsed_time = datetime.now(JST) - start_time
