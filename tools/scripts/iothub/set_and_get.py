@@ -25,9 +25,8 @@ payload_get = {
       "command": [
         {
         "command_type": "character",
-        "command_code": "get_property_value",
-        #get内容の設定
-        "command_value": "operationMode"
+        "command_code": "get_property_value",       
+        "command_value": "operationMode" #get内容の設定
         }
       ],
       #######
