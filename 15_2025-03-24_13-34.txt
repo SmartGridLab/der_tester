@@ -1,0 +1,7 @@
+2025/03/24 13:34:01 Sending set command: operationMode=charge
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... start_command_timestamp (1742790846438)
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... 0295 (10810295027e0105ff017101da00)
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... 0295 (1081029505ff01027E016101DA0142)
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... 0295 (1742790848500)
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... 0295 (1742790846985)
+2025/03/24 13:34:10 Sent command: operationMode=charge | Received: set_property_value (operationMode=charge) ... ok (42)

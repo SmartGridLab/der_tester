@@ -1,0 +1,7 @@
+2025/03/24 13:26:10 Sending set command: operationMode=standby
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... start_command_timestamp (1742790375433)
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... 0290 (10810290027e0105ff017101da00)
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... 0290 (1081029005ff01027E016101DA0144)
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... 0290 (1742790376526)
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... 0290 (1742790375448)
+2025/03/24 13:26:19 Sent command: operationMode=standby | Received: set_property_value (operationMode=standby) ... ok (44)

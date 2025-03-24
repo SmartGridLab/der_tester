@@ -1,0 +1,2 @@
+2025/03/24 13:47:00 Sending get command: remainingCapacity3
+2025/03/24 13:48:42 Error in try_get. Sent command: remainingCapacity3 | Error: 'response'

@@ -1,0 +1,7 @@
+2025/03/24 13:38:03 Sending get command: chargingElectricPower
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... start_command_timestamp (1742791089469)
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... 0298 (10810298027e0105ff017201eb0400000618)
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... 0298 (1081029805ff01027E016201EB00)
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... 0298 (1742791089516)
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... 0298 (1742791089485)
+2025/03/24 13:38:10 Sent command: chargingElectricPower | Received: get_property_value (chargingElectricPower) ... ok (1560)

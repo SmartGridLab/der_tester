@@ -1,0 +1,7 @@
+2025/03/24 12:29:52 Sending get command: operationMode
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... start_command_timestamp (1742787001344)
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... 0276 (10810276027e0105ff017201da0147)
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... 0276 (1081027605ff01027E016201DA00)
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... 0276 (1742787001484)
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... 0276 (1742787001437)
+2025/03/24 12:30:02 Sent command: operationMode | Received: get_property_value (operationMode) ... ok (idle)

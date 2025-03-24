@@ -1,0 +1,7 @@
+2025/03/24 13:36:51 Sending get command: instantaneousElectricPower
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... start_command_timestamp (1742791017399)
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... 0297 (10810297027e0105ff017201d30400000641)
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... 0297 (1081029705ff01027E016201D300)
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... 0297 (1742791017461)
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... 0297 (1742791017430)
+2025/03/24 13:36:58 Sent command: instantaneousElectricPower | Received: get_property_value (instantaneousElectricPower) ... ok (1601)

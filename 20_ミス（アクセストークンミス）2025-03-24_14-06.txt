@@ -1,0 +1,2 @@
+2025/03/24 14:06:08 Sending get command: operationMode
+2025/03/24 14:06:12 Error in try_get. Sent command: operationMode | Error: 'results'

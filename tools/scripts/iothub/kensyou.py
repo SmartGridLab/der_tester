@@ -16,10 +16,11 @@ url = os.environ['TARGET_URL']
 # JSTタイムゾーンの設定
 JST = pytz.timezone('Asia/Tokyo')
 
-# ログファイルの名前を生成する関数
+# ログファイルの名前を生成する関数（日時に「時・分」も含む）
 def get_log_filename():
     now = datetime.datetime.now(JST)
-    base_filename = now.strftime("%Y-%m-%d")
+    # 例："2025-03-22_14-30.txt"
+    base_filename = now.strftime("%Y-%m-%d_%H-%M")
     filename = base_filename + ".txt"
     count = 1
     # 同名のファイルがあれば連番でファイル名を変更
@@ -37,7 +38,7 @@ def log_message(message):
     with open(log_filename, mode='a') as f:
         f.write(f"{timestamp} {message}\n")
 
-# getのpayloadを簡単に作成するための関数
+# getのpayloadを作成する関数
 def getting(getvalue):
     payload_get = {
         "requests": [
@@ -57,7 +58,7 @@ def getting(getvalue):
     }
     return payload_get
 
-# setのpayloadを簡単に作成するための関数
+# setのpayloadを作成する関数
 def setting(setvalue):
     payload_set = {
         "requests": [
@@ -77,23 +78,25 @@ def setting(setvalue):
     }
     return payload_set
 
-# requestのheadersを決める
+# requestのheadersを決定
 headers = {
     "Content-type": "application/json",
     "Authorization": "Bearer " + os.environ['ACCESS_TOKEN'],
     "X-IOT-API-KEY": os.environ['API_KEY']
 }
 
-# try_get, try_setを簡単に実行するための関数
+# try_get: 送信前に送ったコマンド値をログに記録、エラー時もその情報を出力
 def try_get():
     global get1
     get1 = None
-
+    # payload_getから送信するコマンド値を取得
+    input_command = payload_get["requests"][0]["command"][0]["command_value"]
+    log_message(f"Sending get command: {input_command}")
     try:
         response_get1 = requests.request("POST", url, headers=headers, json=payload_get, timeout=200)
         print(response_get1.text)
         jsonData = response_get1.json()
-        # リクエスト結果を逆順にしてget1に格納（最終的に欲しい値）
+        # 逆順に結果を処理
         for result in reversed(jsonData['results']):
             for command in reversed(result["command"]):
                 for response in reversed(command["response"]):
@@ -103,16 +106,28 @@ def try_get():
                         'response_result': response["response_result"],
                         'response_value': response["response_value"]
                     }
-                    log_str = f"{get1['command_code']} ({get1['command_value']}) ... {get1['response_result']} ({get1['response_value']})"
+                    log_str = (f"Sent command: {input_command} | Received: "
+                               f"{get1['command_code']} ({get1['command_value']}) ... "
+                               f"{get1['response_result']} ({get1['response_value']})")
                     print(log_str)
                     print(datetime.datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S"))
                     log_message(log_str)
     except TimeoutError:
-        print("get1 is timed out")
-        log_message("get1 is timed out")
+        error_msg = f"get1 is timed out. Sent command: {input_command}"
+        print(error_msg)
+        log_message(error_msg)
+        time.sleep(5)
+    except Exception as e:
+        error_msg = f"Error in try_get. Sent command: {input_command} | Error: {str(e)}"
+        print(error_msg)
+        log_message(error_msg)
         time.sleep(5)
 
+# try_set: 送信前に送ったコマンド値をログに記録、エラー時もその情報を出力
 def try_set():
+    # payload_setから送信するコマンド値を取得
+    input_command = payload_set["requests"][0]["command"][0]["command_value"]
+    log_message(f"Sending set command: {input_command}")
     try:
         response_set1 = requests.request("POST", url, headers=headers, json=payload_set, timeout=200)
         print(response_set1.text)
@@ -126,22 +141,29 @@ def try_set():
                         'response_result': response["response_result"],
                         'response_value': response["response_value"]
                     }
-                    log_str = f"{set1['command_code']} ({set1['command_value']}) ... {set1['response_result']} ({set1['response_value']})"
+                    log_str = (f"Sent command: {input_command} | Received: "
+                               f"{set1['command_code']} ({set1['command_value']}) ... "
+                               f"{set1['response_result']} ({set1['response_value']})")
                     print(log_str)
                     print(datetime.datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S"))
                     log_message(log_str)
     except TimeoutError:
-        print("set1 is timed out")
-        log_message("set1 is timed out")
+        error_msg = f"set1 is timed out. Sent command: {input_command}"
+        print(error_msg)
+        log_message(error_msg)
+        time.sleep(5)
+    except Exception as e:
+        error_msg = f"Error in try_set. Sent command: {input_command} | Error: {str(e)}"
+        print(error_msg)
+        log_message(error_msg)
         time.sleep(5)
 
 # 現在時刻をJSTで表示
 print(datetime.datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S"))
 
-payload_get = getting("remainingCapacity3")
-try_get()
+#payload_get = getting("operationMode")
+#try_get()
 
-time.sleep(10)
 
-payload_set = setting("operationMode=discharge")
+payload_set = setting("operationMode=standby")
 try_set()
