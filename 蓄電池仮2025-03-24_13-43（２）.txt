@@ -1,0 +1,1 @@
+2025/03/24 13:44:44 Error in try_get. Sent command: operationMode | Error: 'response'

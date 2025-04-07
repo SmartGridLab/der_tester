@@ -70,7 +70,10 @@ class BatteryManager:
         self.current_kwh_capacity = (initial_soc / 100) * max_kwh_capacity
         self.max_charging_power = max_charging_power
         self.max_discharging_power = max_discharging_power
+        self.initial_soc = initial_soc
 
+
+    
     def create_get_payload(self, get_value):
         return {
             "requests": [
@@ -255,7 +258,7 @@ class BatteryManager:
             print("Setting_OperationMode_error")
             return "ERROR"
 
-        time.sleep(20)
+        time.sleep(10)
         payload_get = self.create_get_payload("instantaneousChargingAndDischargingElectricPower")
         get_response = self.try_get(payload_get)
 
@@ -279,7 +282,7 @@ class BatteryManager:
             print("Setting_OperationMode_error")
             return "ERROR"
 
-        time.sleep(20)
+        time.sleep(10)
         payload_get = self.create_get_payload("instantaneousChargingAndDischargingElectricPower")
         get_response = self.try_get(payload_get)
 

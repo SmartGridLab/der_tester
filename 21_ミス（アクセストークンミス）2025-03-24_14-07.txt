@@ -1,0 +1,2 @@
+2025/03/24 14:07:23 Sending set command: operationMode=standby
+2025/03/24 14:07:26 Error in try_set. Sent command: operationMode=standby | Error: 'results'

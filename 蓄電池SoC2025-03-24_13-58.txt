@@ -1,0 +1,8 @@
+2025/03/24 13:58:25 Sending get command: remainingCapacity3
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... start_command_timestamp (1742792314163)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... 0003 (72)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... 0003 (10810003027d1f05ff017201e40100)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... 0003 (1081000305ff01027D1F6201E400)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... 0003 (1742792314244)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... 0003 (1742792314176)
+2025/03/24 13:58:36 Sent command: remainingCapacity3 | Received: get_property_value (remainingCapacity3) ... ok (0)

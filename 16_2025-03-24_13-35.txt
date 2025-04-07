@@ -1,0 +1,7 @@
+2025/03/24 13:35:12 Sending set command: chargingElectricPower=1560
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... start_command_timestamp (1742790917618)
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... 0296 (10810296027e0105ff017101eb00)
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... 0296 (1081029605ff01027E016101EB0400000618)
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... 0296 (1742790917665)
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... 0296 (1742790917634)
+2025/03/24 13:35:18 Sent command: chargingElectricPower=1560 | Received: set_property_value (chargingElectricPower=1560) ... ok (00000618)
